@@ -1,17 +1,23 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { CommentsModule } from './comments/comments.module';
 import { UsersModule } from './users/users.module';
 import { MongooseModule } from '@nestjs/mongoose';
+import { ProductsModule } from './products/products.module';
+import { BrandsModule } from './brands/brands.module';
+import { OrdersModule } from './orders/orders.module';
+import { AuthModule } from './auth/auth.module';
+import { CategoriesModule } from './categories/categories.module';
 
 @Module({
   imports: [
-    CommentsModule,
+    MongooseModule.forRoot('mongodb+srv://manager:123@cloudcomputing.twgpuiv.mongodb.net/api?retryWrites=true&w=majority'),
     UsersModule,
-    MongooseModule.forRoot('mongodb+srv://manager:123@cloudcomputing.twgpuiv.mongodb.net/?retryWrites=true&w=majority')
+    ProductsModule,
+    BrandsModule,
+    OrdersModule,
+    AuthModule,
+    CategoriesModule
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [],
+  providers: [],
 })
 export class AppModule { }
