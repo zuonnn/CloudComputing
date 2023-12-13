@@ -16,12 +16,6 @@ export class AuthService {
     const hashedPassword = await bcrypt.hash(registerDto.password, 10);
 
     try {
-      const existingUser = await this.usersService.getByUsername(registerDto.username);
-
-      if (existingUser) {
-        throw new HttpException('User with that username already exists', HttpStatus.BAD_REQUEST);
-      }
-
       const createdUser = await this.usersService.create({
         ...registerDto,
         password: hashedPassword,
