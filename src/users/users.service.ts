@@ -1,57 +1,32 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { HttpException, HttpStatus, Injectable} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { User } from './schemas/user.schema';
 import { Model } from 'mongoose';
+import { CreateUserDto } from './dto/create-user.dto';
 
 @Injectable()
 export class UsersService {
   constructor(@InjectModel(User.name) private userModel: Model<User>) {}
-
-  async create(createUserDto: CreateUserDto): Promise<User> {
-    const createdUser = new this.userModel(createUserDto);
-    return createdUser.save();
-  }
-
-  async findAll(): Promise<User[]> {
-    return this.userModel.find();
-  }
-
-  async findOne(id: string): Promise<User | null> {
-    try {
-      return await this.userModel.findById(id);
-    } catch (error) {
-      return error;
+  async getByUsername(username: string) {
+    const user = await this.userModel.findOne({ username });
+    if (user) {
+      return user;
     }
+    throw new HttpException('User with this username does not exist', HttpStatus.NOT_FOUND);
   }
-
-  async update(id: string, updateUserDto: UpdateUserDto): Promise<User | null> {
-    try {
-      const existingUser = await this.userModel.findById(id);
-
-      if (!existingUser) {
-        throw new NotFoundException(`User with ID ${id} not found`);
-      }
-
-      existingUser.set(updateUserDto);
-      return existingUser.save();
-    } catch (error) {
-      return error;
+ 
+  async create(userData: CreateUserDto): Promise<User> {
+    const {username} = userData;
+    const existingUser = await this.userModel.findOne({username});
+    if (existingUser) {
+      throw new HttpException('Username already exists', HttpStatus.BAD_REQUEST);
     }
-  }
-
-  async remove(id: string): Promise<boolean> {
+    const newUser = new this.userModel(userData);
     try {
-      const deletedUser = await this.userModel.findByIdAndDelete(id);
-  
-      if (!deletedUser) {
-        throw new NotFoundException(`User with ID ${id} not found`);
-      }
-
-      return true;
+      const savedUser = await newUser.save();
+      return savedUser;
     } catch (error) {
-      return false;
+      throw new HttpException('Failed to create user', HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 }
