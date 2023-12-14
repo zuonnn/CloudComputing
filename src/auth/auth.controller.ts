@@ -8,7 +8,7 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @HttpCode(HttpStatus.CREATED)
-  @Post('/signup')
+  @Post('/register')
   signUp(@Body() signUpDto: RegisterDto): Promise<{ token: string }> {
     return this.authService.register(signUpDto);
   }
