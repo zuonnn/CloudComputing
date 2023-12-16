@@ -17,6 +17,9 @@ export class Product{
   @Prop({ type: Number, required: true })
   price: number;
 
+  @Prop()
+  image: string;
+
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: "Category", required: true })
   category: Category;
 

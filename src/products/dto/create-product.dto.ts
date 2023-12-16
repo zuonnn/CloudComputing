@@ -5,7 +5,7 @@ export class CreateProductDto {
     @IsString()
     @IsNotEmpty()
     name: string;
-
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            
     @IsString()
     @IsOptional()
     type?: string;
@@ -13,6 +13,10 @@ export class CreateProductDto {
     @IsNumber()
     @IsNotEmpty()
     price: number;
+
+    @IsString()
+    @IsNotEmpty()
+    image: string;
 
     @IsNotEmpty()
     category: Types.ObjectId;
