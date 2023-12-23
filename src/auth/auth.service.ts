@@ -37,7 +37,7 @@ export class AuthService {
                 throw new HttpException('User does not exist', HttpStatus.NOT_FOUND);
             }
             await this.verifyPassword(loginDto.password, user.password);
-            const token = this.jwtService.sign({ id: user._id, username: user.username, role: user.role });
+            const token = this.jwtService.sign({ id: user._id, role: user.role });
             return {token};
         } catch (error) {
             throw error;
@@ -51,7 +51,7 @@ export class AuthService {
                 hashedPassword
             );
             if (!isPasswordMatching) {
-                throw new HttpException('Wrong credentials provided', HttpStatus.BAD_REQUEST);
+                throw new HttpException('Wrong password', HttpStatus.BAD_REQUEST);
             }
         } catch (error) {
             throw error;
