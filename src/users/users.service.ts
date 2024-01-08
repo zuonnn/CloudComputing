@@ -4,7 +4,7 @@ import { User } from './schemas/user.schema';
 import { Model } from 'mongoose';
 import { CreateUserDto } from './dto/createUser.dto';
 import * as bcrypt from 'bcrypt';
-import {Role} from './enum/role.enum';
+import {RoleEnum} from './enum/role.enum';
 
 @Injectable()
 export class UsersService {
@@ -24,6 +24,18 @@ export class UsersService {
         }
     }
 
+    async getById(id: string): Promise<User> {
+        try {
+            const user = await this.userModel.findOne({ id });
+            if (!user) {
+                throw new HttpException('User with this id does not exist', HttpStatus.NOT_FOUND);
+            }
+            return user;
+        } catch (error) {
+            throw error;
+        }
+    }
+
     private async hashPassword(password: string): Promise<string> {
         return bcrypt.hash(password, 10);
     }
@@ -35,7 +47,7 @@ export class UsersService {
                 throw new HttpException('User already exists', HttpStatus.BAD_REQUEST);
             }
 
-            if (createUserDto.role && !Object.values(Role).includes(createUserDto.role)) {
+            if (createUserDto.role && !Object.values(RoleEnum).includes(createUserDto.role)) {
                 throw new HttpException('Invalid role provided', HttpStatus.BAD_REQUEST);
             }
 
@@ -43,7 +55,7 @@ export class UsersService {
             const newUser = new this.userModel({
                 ...createUserDto,
                 password: hashedPassword,
-                role: createUserDto.role || Role.User,
+                role: createUserDto.role || RoleEnum.User,
             });
 
             return await newUser.save();
