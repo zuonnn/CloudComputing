@@ -1,5 +1,5 @@
-import { Body, Controller, Get, HttpCode, HttpException, HttpStatus, Post, Res } from '@nestjs/common';
-import { Response } from 'express';
+import { Body, Controller, Get, HttpCode, HttpException, HttpStatus, Post, Req, Res } from '@nestjs/common';
+import { Request, Response } from 'express';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
@@ -25,16 +25,27 @@ export class AuthController {
   @Get('logout')
   async logout(@Res() res: Response) {
     try {
-      res.clearCookie('authentication', {
-        httpOnly: true,
+      res.clearCookie('access_token', {
         path: '/',
-      });
+      }).clearCookie('refresh_token', {
+        path: '/',
+      })
       return res.status(HttpStatus.OK).send();
     } catch (error) {
       throw new HttpException(
         'Logout failed ' + error.message,
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
+    }
+  }
+
+  @Post('refresh-token')
+  async refreshToken(@Req() req: Request, @Res() res: Response) {
+    try {
+      const result = await this.authService.refreshTokens(req, res);
+      return res.status(HttpStatus.OK).json(result);
+    } catch (error) {
+      return res.status(HttpStatus.UNAUTHORIZED).json({ message: error.message });
     }
   }
 }
